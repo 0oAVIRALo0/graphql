@@ -1,20 +1,18 @@
-import React from "react";
-import { useQuery, gql } from "@apollo/client";
-
-const QUERY_ALL_USERS = gql`
-  query getAllUsers {
-    users {
-      id
-      name
-      username
-      age
-      nationality
-    }
-  }
-`;
+import React, { useState } from "react";
+import { useQuery, gql, useLazyQuery } from "@apollo/client";
+import {
+  QUERY_ALL_USERS,
+  QUERY_ALL_MOVIES,
+  QUERY_SINGLE_MOVIE,
+} from "../graphql/queries";
 
 const Displaydata = () => {
+  const [searchedmovie, setSearchedmovie] = useState("");
+
   const { data, loading, error } = useQuery(QUERY_ALL_USERS);
+  const { data: movieData } = useQuery(QUERY_ALL_MOVIES);
+  const [fetchMovie, { data: searchedMovieData, error: searchedMovieError }] =
+    useLazyQuery(QUERY_SINGLE_MOVIE);
 
   if (error) {
     return <h2>Something went wrong...</h2>;
@@ -40,6 +38,16 @@ const Displaydata = () => {
             </div>
           );
         })}
+
+      <div>
+        <input
+          type="text"
+          placeholder="Enter a movie"
+          value={movie}
+          onChange={(event) => setSearchedmovie(event.target.value)}
+        />
+        <button onClick={fetchMovie}>Search</button>
+      </div>
     </div>
   );
 };
